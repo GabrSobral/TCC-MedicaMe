@@ -1,5 +1,477 @@
 (self["webpackChunkMedicaMe"] = self["webpackChunkMedicaMe"] || []).push([["src_app_R_home_home_module_ts"],{
 
+/***/ 68384:
+/*!****************************************************!*\
+  !*** ./node_modules/@capacitor/core/dist/index.js ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Capacitor": () => (/* binding */ Capacitor),
+/* harmony export */   "CapacitorException": () => (/* binding */ CapacitorException),
+/* harmony export */   "CapacitorPlatforms": () => (/* binding */ CapacitorPlatforms),
+/* harmony export */   "ExceptionCode": () => (/* binding */ ExceptionCode),
+/* harmony export */   "Plugins": () => (/* binding */ Plugins),
+/* harmony export */   "WebPlugin": () => (/* binding */ WebPlugin),
+/* harmony export */   "WebView": () => (/* binding */ WebView),
+/* harmony export */   "addPlatform": () => (/* binding */ addPlatform),
+/* harmony export */   "registerPlugin": () => (/* binding */ registerPlugin),
+/* harmony export */   "registerWebPlugin": () => (/* binding */ registerWebPlugin),
+/* harmony export */   "setPlatform": () => (/* binding */ setPlatform)
+/* harmony export */ });
+/*! Capacitor: https://capacitorjs.com/ - MIT License */
+const createCapacitorPlatforms = (win) => {
+    const defaultPlatformMap = new Map();
+    defaultPlatformMap.set('web', { name: 'web' });
+    const capPlatforms = win.CapacitorPlatforms || {
+        currentPlatform: { name: 'web' },
+        platforms: defaultPlatformMap,
+    };
+    const addPlatform = (name, platform) => {
+        capPlatforms.platforms.set(name, platform);
+    };
+    const setPlatform = (name) => {
+        if (capPlatforms.platforms.has(name)) {
+            capPlatforms.currentPlatform = capPlatforms.platforms.get(name);
+        }
+    };
+    capPlatforms.addPlatform = addPlatform;
+    capPlatforms.setPlatform = setPlatform;
+    return capPlatforms;
+};
+const initPlatforms = (win) => (win.CapacitorPlatforms = createCapacitorPlatforms(win));
+/**
+ * @deprecated Set `CapacitorCustomPlatform` on the window object prior to runtime executing in the web app instead
+ */
+const CapacitorPlatforms = /*#__PURE__*/ initPlatforms((typeof globalThis !== 'undefined'
+    ? globalThis
+    : typeof self !== 'undefined'
+        ? self
+        : typeof window !== 'undefined'
+            ? window
+            : typeof global !== 'undefined'
+                ? global
+                : {}));
+/**
+ * @deprecated Set `CapacitorCustomPlatform` on the window object prior to runtime executing in the web app instead
+ */
+const addPlatform = CapacitorPlatforms.addPlatform;
+/**
+ * @deprecated Set `CapacitorCustomPlatform` on the window object prior to runtime executing in the web app instead
+ */
+const setPlatform = CapacitorPlatforms.setPlatform;
+
+const legacyRegisterWebPlugin = (cap, webPlugin) => {
+    var _a;
+    const config = webPlugin.config;
+    const Plugins = cap.Plugins;
+    if (!config || !config.name) {
+        // TODO: add link to upgrade guide
+        throw new Error(`Capacitor WebPlugin is using the deprecated "registerWebPlugin()" function, but without the config. Please use "registerPlugin()" instead to register this web plugin."`);
+    }
+    // TODO: add link to upgrade guide
+    console.warn(`Capacitor plugin "${config.name}" is using the deprecated "registerWebPlugin()" function`);
+    if (!Plugins[config.name] || ((_a = config === null || config === void 0 ? void 0 : config.platforms) === null || _a === void 0 ? void 0 : _a.includes(cap.getPlatform()))) {
+        // Add the web plugin into the plugins registry if there already isn't
+        // an existing one. If it doesn't already exist, that means
+        // there's no existing native implementation for it.
+        // - OR -
+        // If we already have a plugin registered (meaning it was defined in the native layer),
+        // then we should only overwrite it if the corresponding web plugin activates on
+        // a certain platform. For example: Geolocation uses the WebPlugin on Android but not iOS
+        Plugins[config.name] = webPlugin;
+    }
+};
+
+var ExceptionCode;
+(function (ExceptionCode) {
+    /**
+     * API is not implemented.
+     *
+     * This usually means the API can't be used because it is not implemented for
+     * the current platform.
+     */
+    ExceptionCode["Unimplemented"] = "UNIMPLEMENTED";
+    /**
+     * API is not available.
+     *
+     * This means the API can't be used right now because:
+     *   - it is currently missing a prerequisite, such as network connectivity
+     *   - it requires a particular platform or browser version
+     */
+    ExceptionCode["Unavailable"] = "UNAVAILABLE";
+})(ExceptionCode || (ExceptionCode = {}));
+class CapacitorException extends Error {
+    constructor(message, code) {
+        super(message);
+        this.message = message;
+        this.code = code;
+    }
+}
+const getPlatformId = (win) => {
+    var _a, _b;
+    if (win === null || win === void 0 ? void 0 : win.androidBridge) {
+        return 'android';
+    }
+    else if ((_b = (_a = win === null || win === void 0 ? void 0 : win.webkit) === null || _a === void 0 ? void 0 : _a.messageHandlers) === null || _b === void 0 ? void 0 : _b.bridge) {
+        return 'ios';
+    }
+    else {
+        return 'web';
+    }
+};
+
+const createCapacitor = (win) => {
+    var _a, _b, _c, _d, _e;
+    const capCustomPlatform = win.CapacitorCustomPlatform || null;
+    const cap = win.Capacitor || {};
+    const Plugins = (cap.Plugins = cap.Plugins || {});
+    /**
+     * @deprecated Use `capCustomPlatform` instead, default functions like registerPlugin will function with the new object.
+     */
+    const capPlatforms = win.CapacitorPlatforms;
+    const defaultGetPlatform = () => {
+        return capCustomPlatform !== null
+            ? capCustomPlatform.name
+            : getPlatformId(win);
+    };
+    const getPlatform = ((_a = capPlatforms === null || capPlatforms === void 0 ? void 0 : capPlatforms.currentPlatform) === null || _a === void 0 ? void 0 : _a.getPlatform) || defaultGetPlatform;
+    const defaultIsNativePlatform = () => getPlatform() !== 'web';
+    const isNativePlatform = ((_b = capPlatforms === null || capPlatforms === void 0 ? void 0 : capPlatforms.currentPlatform) === null || _b === void 0 ? void 0 : _b.isNativePlatform) || defaultIsNativePlatform;
+    const defaultIsPluginAvailable = (pluginName) => {
+        const plugin = registeredPlugins.get(pluginName);
+        if (plugin === null || plugin === void 0 ? void 0 : plugin.platforms.has(getPlatform())) {
+            // JS implementation available for the current platform.
+            return true;
+        }
+        if (getPluginHeader(pluginName)) {
+            // Native implementation available.
+            return true;
+        }
+        return false;
+    };
+    const isPluginAvailable = ((_c = capPlatforms === null || capPlatforms === void 0 ? void 0 : capPlatforms.currentPlatform) === null || _c === void 0 ? void 0 : _c.isPluginAvailable) ||
+        defaultIsPluginAvailable;
+    const defaultGetPluginHeader = (pluginName) => { var _a; return (_a = cap.PluginHeaders) === null || _a === void 0 ? void 0 : _a.find(h => h.name === pluginName); };
+    const getPluginHeader = ((_d = capPlatforms === null || capPlatforms === void 0 ? void 0 : capPlatforms.currentPlatform) === null || _d === void 0 ? void 0 : _d.getPluginHeader) || defaultGetPluginHeader;
+    const handleError = (err) => win.console.error(err);
+    const pluginMethodNoop = (_target, prop, pluginName) => {
+        return Promise.reject(`${pluginName} does not have an implementation of "${prop}".`);
+    };
+    const registeredPlugins = new Map();
+    const defaultRegisterPlugin = (pluginName, jsImplementations = {}) => {
+        const registeredPlugin = registeredPlugins.get(pluginName);
+        if (registeredPlugin) {
+            console.warn(`Capacitor plugin "${pluginName}" already registered. Cannot register plugins twice.`);
+            return registeredPlugin.proxy;
+        }
+        const platform = getPlatform();
+        const pluginHeader = getPluginHeader(pluginName);
+        let jsImplementation;
+        const loadPluginImplementation = async () => {
+            if (!jsImplementation && platform in jsImplementations) {
+                jsImplementation =
+                    typeof jsImplementations[platform] === 'function'
+                        ? (jsImplementation = await jsImplementations[platform]())
+                        : (jsImplementation = jsImplementations[platform]);
+            }
+            else if (capCustomPlatform !== null &&
+                !jsImplementation &&
+                'web' in jsImplementations) {
+                jsImplementation =
+                    typeof jsImplementations['web'] === 'function'
+                        ? (jsImplementation = await jsImplementations['web']())
+                        : (jsImplementation = jsImplementations['web']);
+            }
+            return jsImplementation;
+        };
+        const createPluginMethod = (impl, prop) => {
+            var _a, _b;
+            if (pluginHeader) {
+                const methodHeader = pluginHeader === null || pluginHeader === void 0 ? void 0 : pluginHeader.methods.find(m => prop === m.name);
+                if (methodHeader) {
+                    if (methodHeader.rtype === 'promise') {
+                        return (options) => cap.nativePromise(pluginName, prop.toString(), options);
+                    }
+                    else {
+                        return (options, callback) => cap.nativeCallback(pluginName, prop.toString(), options, callback);
+                    }
+                }
+                else if (impl) {
+                    return (_a = impl[prop]) === null || _a === void 0 ? void 0 : _a.bind(impl);
+                }
+            }
+            else if (impl) {
+                return (_b = impl[prop]) === null || _b === void 0 ? void 0 : _b.bind(impl);
+            }
+            else {
+                throw new CapacitorException(`"${pluginName}" plugin is not implemented on ${platform}`, ExceptionCode.Unimplemented);
+            }
+        };
+        const createPluginMethodWrapper = (prop) => {
+            let remove;
+            const wrapper = (...args) => {
+                const p = loadPluginImplementation().then(impl => {
+                    const fn = createPluginMethod(impl, prop);
+                    if (fn) {
+                        const p = fn(...args);
+                        remove = p === null || p === void 0 ? void 0 : p.remove;
+                        return p;
+                    }
+                    else {
+                        throw new CapacitorException(`"${pluginName}.${prop}()" is not implemented on ${platform}`, ExceptionCode.Unimplemented);
+                    }
+                });
+                if (prop === 'addListener') {
+                    p.remove = async () => remove();
+                }
+                return p;
+            };
+            // Some flair ✨
+            wrapper.toString = () => `${prop.toString()}() { [capacitor code] }`;
+            Object.defineProperty(wrapper, 'name', {
+                value: prop,
+                writable: false,
+                configurable: false,
+            });
+            return wrapper;
+        };
+        const addListener = createPluginMethodWrapper('addListener');
+        const removeListener = createPluginMethodWrapper('removeListener');
+        const addListenerNative = (eventName, callback) => {
+            const call = addListener({ eventName }, callback);
+            const remove = async () => {
+                const callbackId = await call;
+                removeListener({
+                    eventName,
+                    callbackId,
+                }, callback);
+            };
+            const p = new Promise(resolve => call.then(() => resolve({ remove })));
+            p.remove = async () => {
+                console.warn(`Using addListener() without 'await' is deprecated.`);
+                await remove();
+            };
+            return p;
+        };
+        const proxy = new Proxy({}, {
+            get(_, prop) {
+                switch (prop) {
+                    // https://github.com/facebook/react/issues/20030
+                    case '$$typeof':
+                        return undefined;
+                    case 'toJSON':
+                        return () => ({});
+                    case 'addListener':
+                        return pluginHeader ? addListenerNative : addListener;
+                    case 'removeListener':
+                        return removeListener;
+                    default:
+                        return createPluginMethodWrapper(prop);
+                }
+            },
+        });
+        Plugins[pluginName] = proxy;
+        registeredPlugins.set(pluginName, {
+            name: pluginName,
+            proxy,
+            platforms: new Set([
+                ...Object.keys(jsImplementations),
+                ...(pluginHeader ? [platform] : []),
+            ]),
+        });
+        return proxy;
+    };
+    const registerPlugin = ((_e = capPlatforms === null || capPlatforms === void 0 ? void 0 : capPlatforms.currentPlatform) === null || _e === void 0 ? void 0 : _e.registerPlugin) || defaultRegisterPlugin;
+    // Add in convertFileSrc for web, it will already be available in native context
+    if (!cap.convertFileSrc) {
+        cap.convertFileSrc = filePath => filePath;
+    }
+    cap.getPlatform = getPlatform;
+    cap.handleError = handleError;
+    cap.isNativePlatform = isNativePlatform;
+    cap.isPluginAvailable = isPluginAvailable;
+    cap.pluginMethodNoop = pluginMethodNoop;
+    cap.registerPlugin = registerPlugin;
+    cap.Exception = CapacitorException;
+    cap.DEBUG = !!cap.DEBUG;
+    cap.isLoggingEnabled = !!cap.isLoggingEnabled;
+    // Deprecated props
+    cap.platform = cap.getPlatform();
+    cap.isNative = cap.isNativePlatform();
+    return cap;
+};
+const initCapacitorGlobal = (win) => (win.Capacitor = createCapacitor(win));
+
+const Capacitor = /*#__PURE__*/ initCapacitorGlobal(typeof globalThis !== 'undefined'
+    ? globalThis
+    : typeof self !== 'undefined'
+        ? self
+        : typeof window !== 'undefined'
+            ? window
+            : typeof global !== 'undefined'
+                ? global
+                : {});
+const registerPlugin = Capacitor.registerPlugin;
+/**
+ * @deprecated Provided for backwards compatibility for Capacitor v2 plugins.
+ * Capacitor v3 plugins should import the plugin directly. This "Plugins"
+ * export is deprecated in v3, and will be removed in v4.
+ */
+const Plugins = Capacitor.Plugins;
+/**
+ * Provided for backwards compatibility. Use the registerPlugin() API
+ * instead, and provide the web plugin as the "web" implmenetation.
+ * For example
+ *
+ * export const Example = registerPlugin('Example', {
+ *   web: () => import('./web').then(m => new m.Example())
+ * })
+ *
+ * @deprecated Deprecated in v3, will be removed from v4.
+ */
+const registerWebPlugin = (plugin) => legacyRegisterWebPlugin(Capacitor, plugin);
+
+/**
+ * Base class web plugins should extend.
+ */
+class WebPlugin {
+    constructor(config) {
+        this.listeners = {};
+        this.windowListeners = {};
+        if (config) {
+            // TODO: add link to upgrade guide
+            console.warn(`Capacitor WebPlugin "${config.name}" config object was deprecated in v3 and will be removed in v4.`);
+            this.config = config;
+        }
+    }
+    addListener(eventName, listenerFunc) {
+        const listeners = this.listeners[eventName];
+        if (!listeners) {
+            this.listeners[eventName] = [];
+        }
+        this.listeners[eventName].push(listenerFunc);
+        // If we haven't added a window listener for this event and it requires one,
+        // go ahead and add it
+        const windowListener = this.windowListeners[eventName];
+        if (windowListener && !windowListener.registered) {
+            this.addWindowListener(windowListener);
+        }
+        const remove = async () => this.removeListener(eventName, listenerFunc);
+        const p = Promise.resolve({ remove });
+        Object.defineProperty(p, 'remove', {
+            value: async () => {
+                console.warn(`Using addListener() without 'await' is deprecated.`);
+                await remove();
+            },
+        });
+        return p;
+    }
+    async removeAllListeners() {
+        this.listeners = {};
+        for (const listener in this.windowListeners) {
+            this.removeWindowListener(this.windowListeners[listener]);
+        }
+        this.windowListeners = {};
+    }
+    notifyListeners(eventName, data) {
+        const listeners = this.listeners[eventName];
+        if (listeners) {
+            listeners.forEach(listener => listener(data));
+        }
+    }
+    hasListeners(eventName) {
+        return !!this.listeners[eventName].length;
+    }
+    registerWindowListener(windowEventName, pluginEventName) {
+        this.windowListeners[pluginEventName] = {
+            registered: false,
+            windowEventName,
+            pluginEventName,
+            handler: event => {
+                this.notifyListeners(pluginEventName, event);
+            },
+        };
+    }
+    unimplemented(msg = 'not implemented') {
+        return new Capacitor.Exception(msg, ExceptionCode.Unimplemented);
+    }
+    unavailable(msg = 'not available') {
+        return new Capacitor.Exception(msg, ExceptionCode.Unavailable);
+    }
+    async removeListener(eventName, listenerFunc) {
+        const listeners = this.listeners[eventName];
+        if (!listeners) {
+            return;
+        }
+        const index = listeners.indexOf(listenerFunc);
+        this.listeners[eventName].splice(index, 1);
+        // If there are no more listeners for this type of event,
+        // remove the window listener
+        if (!this.listeners[eventName].length) {
+            this.removeWindowListener(this.windowListeners[eventName]);
+        }
+    }
+    addWindowListener(handle) {
+        window.addEventListener(handle.windowEventName, handle.handler);
+        handle.registered = true;
+    }
+    removeWindowListener(handle) {
+        if (!handle) {
+            return;
+        }
+        window.removeEventListener(handle.windowEventName, handle.handler);
+        handle.registered = false;
+    }
+}
+
+const WebView = /*#__PURE__*/ registerPlugin('WebView');
+
+
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 84264:
+/*!*****************************************************************************!*\
+  !*** ./node_modules/@capacitor/local-notifications/dist/esm/definitions.js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/// <reference types="@capacitor/cli" />
+
+//# sourceMappingURL=definitions.js.map
+
+/***/ }),
+
+/***/ 12273:
+/*!***********************************************************************!*\
+  !*** ./node_modules/@capacitor/local-notifications/dist/esm/index.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "LocalNotifications": () => (/* binding */ LocalNotifications)
+/* harmony export */ });
+/* harmony import */ var _capacitor_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @capacitor/core */ 68384);
+/* harmony import */ var _definitions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./definitions */ 84264);
+
+const LocalNotifications = (0,_capacitor_core__WEBPACK_IMPORTED_MODULE_0__.registerPlugin)('LocalNotifications', {
+    web: () => __webpack_require__.e(/*! import() */ "node_modules_capacitor_local-notifications_dist_esm_web_js").then(__webpack_require__.bind(__webpack_require__, /*! ./web */ 81161)).then(m => new m.LocalNotificationsWeb()),
+});
+
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
 /***/ 33293:
 /*!***********************************************!*\
   !*** ./src/app/R/home/home-routing.module.ts ***!
@@ -92,12 +564,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "HomePage": () => (/* binding */ HomePage)
 /* harmony export */ });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! tslib */ 64762);
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! tslib */ 64762);
 /* harmony import */ var _raw_loader_home_page_html__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !raw-loader!./home.page.html */ 799);
 /* harmony import */ var _home_page_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./home.page.scss */ 28021);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/core */ 37716);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/core */ 37716);
 /* harmony import */ var src_app_services_navegation_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/app/services/navegation.service */ 6192);
 /* harmony import */ var src_app_services_servidor_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! src/app/services/servidor.service */ 58914);
+/* harmony import */ var _capacitor_local_notifications__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @capacitor/local-notifications */ 12273);
+
 
 
 
@@ -162,6 +636,18 @@ let HomePage = class HomePage {
         //Enviar ao PHP
         let dados = 'phpSituacao=' + situacao + '&phpCodigo=' + codigo + '&phpEmail=' + localStorage.getItem('email');
         this.servidor.enviar('Home/situacao.php', dados).subscribe(res => {
+            console.log("Banana");
+            _capacitor_local_notifications__WEBPACK_IMPORTED_MODULE_4__.LocalNotifications.schedule({
+                notifications: [{
+                        id: 1,
+                        body: "Toma remédio oh animal",
+                        title: "Remédio mano",
+                        autoCancel: false,
+                        schedule: {
+                            on: { second: 5 }
+                        }
+                    }]
+            }).then((data) => { console.log(data); });
             this.carregar();
         });
     }
@@ -296,8 +782,8 @@ HomePage.ctorParameters = () => [
     { type: src_app_services_navegation_service__WEBPACK_IMPORTED_MODULE_2__.NavegationService },
     { type: src_app_services_servidor_service__WEBPACK_IMPORTED_MODULE_3__.ServidorService }
 ];
-HomePage = (0,tslib__WEBPACK_IMPORTED_MODULE_4__.__decorate)([
-    (0,_angular_core__WEBPACK_IMPORTED_MODULE_5__.Component)({
+HomePage = (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__decorate)([
+    (0,_angular_core__WEBPACK_IMPORTED_MODULE_6__.Component)({
         selector: 'app-home',
         template: _raw_loader_home_page_html__WEBPACK_IMPORTED_MODULE_0__.default,
         styles: [_home_page_scss__WEBPACK_IMPORTED_MODULE_1__.default]
@@ -319,7 +805,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("@charset \"UTF-8\";\n/*#region Mid Geral*/\n.meio {\n  width: 90%;\n  margin-top: calc((100vw / 5) + 20px);\n  margin-left: 5%;\n  color: var(--dark-space-cadet);\n}\n.meio .content {\n  margin-bottom: calc((100vw / 5) + ((100vw / 5) / 2) + 10px);\n}\n/*#endregion*/\n/*#region Medicamentos - Geral*/\n.medicamentos {\n  width: 100%;\n  height: 85px;\n  padding: 10px;\n  margin: 10px 0px 20px 0px;\n  border-radius: 15px;\n  box-sizing: border-box;\n}\n.medicamentos img {\n  width: 50px;\n  height: 50px;\n  margin: 0px 10px 0px 10px;\n}\n.medicamentos .text {\n  height: 100%;\n  margin: 0px 0px 0px 10px;\n}\n.medicamentos h3 {\n  color: var(--dark-space-cadet);\n  font-family: \"Saira\";\n}\n.medicamentos p {\n  color: var(--space-cadet);\n}\n/*#endregion*/\n/*#region Medicamentos - Pedente*/\n.pendente h3 {\n  color: var(--red);\n}\n.pendente .medicamentos {\n  border-color: var(--red);\n  border-style: solid;\n  border-width: 2px;\n  color: var(--dark-space-cadet);\n  animation-name: pendente;\n  animation-duration: 3s;\n  animation-timing-function: linear;\n  animation-iteration-count: infinite;\n}\n.pendente svg {\n  height: 40px;\n}\n.pendente .tomei {\n  fill: var(--state-blue);\n  margin-left: auto;\n}\n.pendente .nao-tomei {\n  fill: var(--red);\n  margin-left: 10px;\n}\n@keyframes pendente {\n  0% {\n    transform: rotate(0deg);\n  }\n  75% {\n    transform: rotate(0deg);\n  }\n  80% {\n    transform: rotate(-2deg);\n  }\n  85% {\n    transform: rotate(2deg);\n  }\n  90% {\n    transform: rotate(-2deg);\n  }\n  95% {\n    transform: rotate(2deg);\n  }\n  100% {\n    transform: rotate(0deg);\n  }\n}\n/*#endregion*/\n/*#region Medicamentos - Próximo*/\n.proximo .medicamentos {\n  background-color: var(--lavander);\n  box-shadow: 0px 4px 4px rgba(122, 122, 165, 0.5);\n}\n/*#endregion*/\n.naoTem {\n  height: 50vh;\n}\n.naoTem svg {\n  width: 40%;\n  fill: var(--lavander);\n  margin-top: 10vh;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImhvbWUucGFnZS5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLGdCQUFnQjtBQUFoQixvQkFBQTtBQUNBO0VBRUksVUFBQTtFQUVBLG9DQUFBO0VBQ0EsZUFBQTtFQUVBLDhCQUFBO0FBREo7QUFHSTtFQUVJLDJEQUFBO0FBRlI7QUFLQSxhQUFBO0FBRUEsK0JBQUE7QUFDQTtFQUVJLFdBQUE7RUFDQSxZQUFBO0VBRUEsYUFBQTtFQUNBLHlCQUFBO0VBRUEsbUJBQUE7RUFFQSxzQkFBQTtBQVBKO0FBU0k7RUFFSSxXQUFBO0VBQ0EsWUFBQTtFQUNBLHlCQUFBO0FBUlI7QUFXSTtFQUVJLFlBQUE7RUFFQSx3QkFBQTtBQVhSO0FBY0k7RUFFSSw4QkFBQTtFQUNBLG9CQUFBO0FBYlI7QUFnQkk7RUFFSSx5QkFBQTtBQWZSO0FBa0JBLGFBQUE7QUFFQSxpQ0FBQTtBQUdJO0VBRUksaUJBQUE7QUFuQlI7QUFzQkk7RUFFSSx3QkFBQTtFQUNBLG1CQUFBO0VBQ0EsaUJBQUE7RUFFQSw4QkFBQTtFQUVBLHdCQUFBO0VBQ0Esc0JBQUE7RUFDQSxpQ0FBQTtFQUNBLG1DQUFBO0FBdkJSO0FBMEJJO0VBRUksWUFBQTtBQXpCUjtBQTRCSTtFQUVJLHVCQUFBO0VBRUEsaUJBQUE7QUE1QlI7QUErQkk7RUFFSSxnQkFBQTtFQUVBLGlCQUFBO0FBL0JSO0FBbUNBO0VBRUk7SUFBRyx1QkFBQTtFQWhDTDtFQWlDRTtJQUFJLHVCQUFBO0VBOUJOO0VBK0JFO0lBQUksd0JBQUE7RUE1Qk47RUE2QkU7SUFBSSx1QkFBQTtFQTFCTjtFQTJCRTtJQUFJLHdCQUFBO0VBeEJOO0VBeUJFO0lBQUksdUJBQUE7RUF0Qk47RUF1QkU7SUFBSyx1QkFBQTtFQXBCUDtBQUNGO0FBcUJBLGFBQUE7QUFFQSxpQ0FBQTtBQUNBO0VBRUksaUNBQUE7RUFFQSxnREFBQTtBQXRCSjtBQXdCQSxhQUFBO0FBR0E7RUFFSSxZQUFBO0FBeEJKO0FBMEJJO0VBRUksVUFBQTtFQUNBLHFCQUFBO0VBRUEsZ0JBQUE7QUExQlIiLCJmaWxlIjoiaG9tZS5wYWdlLnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyJAY2hhcnNldCBcIlVURi04XCI7XG4vKiNyZWdpb24gTWlkIEdlcmFsKi9cbi5tZWlvIHtcbiAgd2lkdGg6IDkwJTtcbiAgbWFyZ2luLXRvcDogY2FsYygoMTAwdncgLyA1KSArIDIwcHgpO1xuICBtYXJnaW4tbGVmdDogNSU7XG4gIGNvbG9yOiB2YXIoLS1kYXJrLXNwYWNlLWNhZGV0KTtcbn1cbi5tZWlvIC5jb250ZW50IHtcbiAgbWFyZ2luLWJvdHRvbTogY2FsYygoMTAwdncgLyA1KSArICgoMTAwdncgLyA1KSAvIDIpICsgMTBweCk7XG59XG5cbi8qI2VuZHJlZ2lvbiovXG4vKiNyZWdpb24gTWVkaWNhbWVudG9zIC0gR2VyYWwqL1xuLm1lZGljYW1lbnRvcyB7XG4gIHdpZHRoOiAxMDAlO1xuICBoZWlnaHQ6IDg1cHg7XG4gIHBhZGRpbmc6IDEwcHg7XG4gIG1hcmdpbjogMTBweCAwcHggMjBweCAwcHg7XG4gIGJvcmRlci1yYWRpdXM6IDE1cHg7XG4gIGJveC1zaXppbmc6IGJvcmRlci1ib3g7XG59XG4ubWVkaWNhbWVudG9zIGltZyB7XG4gIHdpZHRoOiA1MHB4O1xuICBoZWlnaHQ6IDUwcHg7XG4gIG1hcmdpbjogMHB4IDEwcHggMHB4IDEwcHg7XG59XG4ubWVkaWNhbWVudG9zIC50ZXh0IHtcbiAgaGVpZ2h0OiAxMDAlO1xuICBtYXJnaW46IDBweCAwcHggMHB4IDEwcHg7XG59XG4ubWVkaWNhbWVudG9zIGgzIHtcbiAgY29sb3I6IHZhcigtLWRhcmstc3BhY2UtY2FkZXQpO1xuICBmb250LWZhbWlseTogXCJTYWlyYVwiO1xufVxuLm1lZGljYW1lbnRvcyBwIHtcbiAgY29sb3I6IHZhcigtLXNwYWNlLWNhZGV0KTtcbn1cblxuLyojZW5kcmVnaW9uKi9cbi8qI3JlZ2lvbiBNZWRpY2FtZW50b3MgLSBQZWRlbnRlKi9cbi5wZW5kZW50ZSBoMyB7XG4gIGNvbG9yOiB2YXIoLS1yZWQpO1xufVxuLnBlbmRlbnRlIC5tZWRpY2FtZW50b3Mge1xuICBib3JkZXItY29sb3I6IHZhcigtLXJlZCk7XG4gIGJvcmRlci1zdHlsZTogc29saWQ7XG4gIGJvcmRlci13aWR0aDogMnB4O1xuICBjb2xvcjogdmFyKC0tZGFyay1zcGFjZS1jYWRldCk7XG4gIGFuaW1hdGlvbi1uYW1lOiBwZW5kZW50ZTtcbiAgYW5pbWF0aW9uLWR1cmF0aW9uOiAzcztcbiAgYW5pbWF0aW9uLXRpbWluZy1mdW5jdGlvbjogbGluZWFyO1xuICBhbmltYXRpb24taXRlcmF0aW9uLWNvdW50OiBpbmZpbml0ZTtcbn1cbi5wZW5kZW50ZSBzdmcge1xuICBoZWlnaHQ6IDQwcHg7XG59XG4ucGVuZGVudGUgLnRvbWVpIHtcbiAgZmlsbDogdmFyKC0tc3RhdGUtYmx1ZSk7XG4gIG1hcmdpbi1sZWZ0OiBhdXRvO1xufVxuLnBlbmRlbnRlIC5uYW8tdG9tZWkge1xuICBmaWxsOiB2YXIoLS1yZWQpO1xuICBtYXJnaW4tbGVmdDogMTBweDtcbn1cblxuQGtleWZyYW1lcyBwZW5kZW50ZSB7XG4gIDAlIHtcbiAgICB0cmFuc2Zvcm06IHJvdGF0ZSgwZGVnKTtcbiAgfVxuICA3NSUge1xuICAgIHRyYW5zZm9ybTogcm90YXRlKDBkZWcpO1xuICB9XG4gIDgwJSB7XG4gICAgdHJhbnNmb3JtOiByb3RhdGUoLTJkZWcpO1xuICB9XG4gIDg1JSB7XG4gICAgdHJhbnNmb3JtOiByb3RhdGUoMmRlZyk7XG4gIH1cbiAgOTAlIHtcbiAgICB0cmFuc2Zvcm06IHJvdGF0ZSgtMmRlZyk7XG4gIH1cbiAgOTUlIHtcbiAgICB0cmFuc2Zvcm06IHJvdGF0ZSgyZGVnKTtcbiAgfVxuICAxMDAlIHtcbiAgICB0cmFuc2Zvcm06IHJvdGF0ZSgwZGVnKTtcbiAgfVxufVxuLyojZW5kcmVnaW9uKi9cbi8qI3JlZ2lvbiBNZWRpY2FtZW50b3MgLSBQcsOzeGltbyovXG4ucHJveGltbyAubWVkaWNhbWVudG9zIHtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGF2YW5kZXIpO1xuICBib3gtc2hhZG93OiAwcHggNHB4IDRweCByZ2JhKDEyMiwgMTIyLCAxNjUsIDAuNSk7XG59XG5cbi8qI2VuZHJlZ2lvbiovXG4ubmFvVGVtIHtcbiAgaGVpZ2h0OiA1MHZoO1xufVxuLm5hb1RlbSBzdmcge1xuICB3aWR0aDogNDAlO1xuICBmaWxsOiB2YXIoLS1sYXZhbmRlcik7XG4gIG1hcmdpbi10b3A6IDEwdmg7XG59Il19 */");
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("@charset \"UTF-8\";\n/*#region Mid Geral*/\n.meio {\n  width: 90%;\n  margin-top: calc((100vw / 5) + 20px);\n  margin-left: 5%;\n  color: var(--dark-space-cadet);\n}\n.meio .content {\n  margin-bottom: calc((100vw / 5) + ((100vw / 5) / 2) + 10px);\n}\n/*#endregion*/\n/*#region Medicamentos - Geral*/\n.medicamentos {\n  width: 100%;\n  height: 85px;\n  padding: 10px;\n  margin: 10px 0px 20px 0px;\n  border-radius: 15px;\n  box-sizing: border-box;\n}\n.medicamentos img {\n  width: 50px;\n  height: 50px;\n  margin: 0px 10px 0px 10px;\n}\n.medicamentos .text {\n  height: 100%;\n  margin: 0px 0px 0px 10px;\n}\n.medicamentos h3 {\n  color: var(--dark-space-cadet);\n  font-family: \"Saira\";\n}\n.medicamentos p {\n  color: var(--space-cadet);\n}\n/*#endregion*/\n/*#region Medicamentos - Pedente*/\n.pendente h3 {\n  color: var(--red);\n}\n.pendente .medicamentos {\n  border-color: var(--red);\n  border-style: solid;\n  border-width: 2px;\n  color: var(--dark-space-cadet);\n  animation-name: pendente;\n  animation-duration: 3s;\n  animation-timing-function: linear;\n  animation-iteration-count: infinite;\n}\n.pendente svg {\n  height: 40px;\n}\n.pendente .tomei {\n  fill: var(--state-blue);\n  margin-left: auto;\n}\n.pendente .nao-tomei {\n  fill: var(--red);\n  margin-left: 10px;\n}\n@keyframes pendente {\n  0% {\n    transform: rotate(0deg);\n  }\n  75% {\n    transform: rotate(0deg);\n  }\n  80% {\n    transform: rotate(-2deg);\n  }\n  85% {\n    transform: rotate(2deg);\n  }\n  90% {\n    transform: rotate(-2deg);\n  }\n  95% {\n    transform: rotate(2deg);\n  }\n  100% {\n    transform: rotate(0deg);\n  }\n}\n/*#endregion*/\n/*#region Medicamentos - Próximo*/\n.proximo .medicamentos {\n  background-color: var(--lavander);\n  box-shadow: 0px 4px 4px rgba(122, 122, 165, 0.5);\n}\n/*#endregion*/\n.naoTem {\n  height: 50vh;\n}\n.naoTem svg {\n  width: 40%;\n  fill: var(--lavander);\n  margin-top: 10vh;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImhvbWUucGFnZS5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLGdCQUFnQjtBQUFoQixvQkFBQTtBQUNBO0VBRUksVUFBQTtFQUVBLG9DQUFBO0VBQ0EsZUFBQTtFQUVBLDhCQUFBO0FBREo7QUFHSTtFQUVJLDJEQUFBO0FBRlI7QUFLQSxhQUFBO0FBRUEsK0JBQUE7QUFDQTtFQUVJLFdBQUE7RUFDQSxZQUFBO0VBRUEsYUFBQTtFQUNBLHlCQUFBO0VBRUEsbUJBQUE7RUFFQSxzQkFBQTtBQVBKO0FBU0k7RUFFSSxXQUFBO0VBQ0EsWUFBQTtFQUNBLHlCQUFBO0FBUlI7QUFXSTtFQUVJLFlBQUE7RUFFQSx3QkFBQTtBQVhSO0FBY0k7RUFFSSw4QkFBQTtFQUNBLG9CQUFBO0FBYlI7QUFnQkk7RUFFSSx5QkFBQTtBQWZSO0FBa0JBLGFBQUE7QUFFQSxpQ0FBQTtBQUdJO0VBRUksaUJBQUE7QUFuQlI7QUFzQkk7RUFFSSx3QkFBQTtFQUNBLG1CQUFBO0VBQ0EsaUJBQUE7RUFFQSw4QkFBQTtFQUVBLHdCQUFBO0VBQ0Esc0JBQUE7RUFDQSxpQ0FBQTtFQUNBLG1DQUFBO0FBdkJSO0FBMEJJO0VBRUksWUFBQTtBQXpCUjtBQTRCSTtFQUVJLHVCQUFBO0VBRUEsaUJBQUE7QUE1QlI7QUErQkk7RUFFSSxnQkFBQTtFQUVBLGlCQUFBO0FBL0JSO0FBbUNBO0VBRUk7SUFBRyx1QkFBQTtFQWhDTDtFQWlDRTtJQUFJLHVCQUFBO0VBOUJOO0VBK0JFO0lBQUksd0JBQUE7RUE1Qk47RUE2QkU7SUFBSSx1QkFBQTtFQTFCTjtFQTJCRTtJQUFJLHdCQUFBO0VBeEJOO0VBeUJFO0lBQUksdUJBQUE7RUF0Qk47RUF1QkU7SUFBSyx1QkFBQTtFQXBCUDtBQUNGO0FBcUJBLGFBQUE7QUFFQSxpQ0FBQTtBQUNBO0VBRUksaUNBQUE7RUFFQSxnREFBQTtBQXRCSjtBQXdCQSxhQUFBO0FBR0E7RUFFSSxZQUFBO0FBeEJKO0FBMEJJO0VBRUksVUFBQTtFQUNBLHFCQUFBO0VBRUEsZ0JBQUE7QUExQlIiLCJmaWxlIjoiaG9tZS5wYWdlLnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIvKiNyZWdpb24gTWlkIEdlcmFsKi9cbi5tZWlvXG57XG4gICAgd2lkdGg6IDkwJTtcblxuICAgIG1hcmdpbi10b3A6IGNhbGMoKDEwMHZ3IC8gNSkgKyAyMHB4KTtcbiAgICBtYXJnaW4tbGVmdDogNSU7XG5cbiAgICBjb2xvcjogdmFyKC0tZGFyay1zcGFjZS1jYWRldCk7XG5cbiAgICAuY29udGVudFxuICAgIHtcbiAgICAgICAgbWFyZ2luLWJvdHRvbTogY2FsYygoMTAwdncgLyA1KSArICgoMTAwdncgLyA1KSAvIDIpICsgMTBweCk7XG4gICAgfVxufVxuLyojZW5kcmVnaW9uKi9cblxuLyojcmVnaW9uIE1lZGljYW1lbnRvcyAtIEdlcmFsKi9cbi5tZWRpY2FtZW50b3NcbntcbiAgICB3aWR0aDogMTAwJTtcbiAgICBoZWlnaHQ6IDg1cHg7XG5cbiAgICBwYWRkaW5nOiAxMHB4O1xuICAgIG1hcmdpbjogMTBweCAwcHggMjBweCAwcHg7XG5cbiAgICBib3JkZXItcmFkaXVzOiAxNXB4O1xuXG4gICAgYm94LXNpemluZzogYm9yZGVyLWJveDtcblxuICAgIGltZ1xuICAgIHtcbiAgICAgICAgd2lkdGg6IDUwcHg7XG4gICAgICAgIGhlaWdodDogNTBweDtcbiAgICAgICAgbWFyZ2luOiAwcHggMTBweCAwcHggMTBweDtcbiAgICB9XG5cbiAgICAudGV4dFxuICAgIHtcbiAgICAgICAgaGVpZ2h0OiAxMDAlO1xuXG4gICAgICAgIG1hcmdpbjogMHB4IDBweCAwcHggMTBweDtcbiAgICB9XG5cbiAgICBoM1xuICAgIHtcbiAgICAgICAgY29sb3I6IHZhcigtLWRhcmstc3BhY2UtY2FkZXQpO1xuICAgICAgICBmb250LWZhbWlseTogJ1NhaXJhJztcbiAgICB9XG5cbiAgICBwXG4gICAge1xuICAgICAgICBjb2xvcjogdmFyKC0tc3BhY2UtY2FkZXQpO1xuICAgIH1cbn1cbi8qI2VuZHJlZ2lvbiovXG5cbi8qI3JlZ2lvbiBNZWRpY2FtZW50b3MgLSBQZWRlbnRlKi9cbi5wZW5kZW50ZVxue1xuICAgIGgzXG4gICAge1xuICAgICAgICBjb2xvcjogdmFyKC0tcmVkKTtcbiAgICB9XG5cbiAgICAubWVkaWNhbWVudG9zXG4gICAge1xuICAgICAgICBib3JkZXItY29sb3I6IHZhcigtLXJlZCk7XG4gICAgICAgIGJvcmRlci1zdHlsZTogc29saWQ7XG4gICAgICAgIGJvcmRlci13aWR0aDogMnB4O1xuXG4gICAgICAgIGNvbG9yOiB2YXIoLS1kYXJrLXNwYWNlLWNhZGV0KTtcblxuICAgICAgICBhbmltYXRpb24tbmFtZTogcGVuZGVudGU7XG4gICAgICAgIGFuaW1hdGlvbi1kdXJhdGlvbjogM3M7XG4gICAgICAgIGFuaW1hdGlvbi10aW1pbmctZnVuY3Rpb246IGxpbmVhcjtcbiAgICAgICAgYW5pbWF0aW9uLWl0ZXJhdGlvbi1jb3VudDogaW5maW5pdGU7XG4gICAgfVxuXG4gICAgc3ZnXG4gICAge1xuICAgICAgICBoZWlnaHQ6IDQwcHg7XG4gICAgfVxuXG4gICAgLnRvbWVpXG4gICAge1xuICAgICAgICBmaWxsOiB2YXIoLS1zdGF0ZS1ibHVlKTtcblxuICAgICAgICBtYXJnaW4tbGVmdDogYXV0bztcbiAgICB9XG5cbiAgICAubmFvLXRvbWVpXG4gICAge1xuICAgICAgICBmaWxsOiB2YXIoLS1yZWQpO1xuXG4gICAgICAgIG1hcmdpbi1sZWZ0OiAxMHB4O1xuICAgIH1cbn1cblxuQGtleWZyYW1lcyBwZW5kZW50ZVxue1xuICAgIDAle3RyYW5zZm9ybTogcm90YXRlKDBkZWcpO31cbiAgICA3NSV7dHJhbnNmb3JtOiByb3RhdGUoMGRlZyk7fVxuICAgIDgwJXt0cmFuc2Zvcm06IHJvdGF0ZSgtMmRlZyk7fVxuICAgIDg1JXt0cmFuc2Zvcm06IHJvdGF0ZSgyZGVnKTt9XG4gICAgOTAle3RyYW5zZm9ybTogcm90YXRlKC0yZGVnKTt9XG4gICAgOTUle3RyYW5zZm9ybTogcm90YXRlKDJkZWcpO31cbiAgICAxMDAle3RyYW5zZm9ybTogcm90YXRlKDBkZWcpO31cbn1cbi8qI2VuZHJlZ2lvbiovXG5cbi8qI3JlZ2lvbiBNZWRpY2FtZW50b3MgLSBQcsOzeGltbyovXG4ucHJveGltbyAubWVkaWNhbWVudG9zXG57XG4gICAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGF2YW5kZXIpO1xuXG4gICAgYm94LXNoYWRvdzogMHB4IDRweCA0cHggcmdiKDEyMiwgMTIyLCAxNjUsIDAuNSk7XG59XG4vKiNlbmRyZWdpb24qL1xuXG4vLyNyZWdpb24gTWVkaWNhbWVudG9zIC0gU2VtIE1lZGljYW1lbnRvc1xuLm5hb1RlbVxue1xuICAgIGhlaWdodDogNTB2aDtcblxuICAgIHN2Z1xuICAgIHtcbiAgICAgICAgd2lkdGg6IDQwJTtcbiAgICAgICAgZmlsbDogdmFyKC0tbGF2YW5kZXIpO1xuXG4gICAgICAgIG1hcmdpbi10b3A6IDEwdmg7XG4gICAgfVxufVxuLy8jZW5kcmVnaW9uXG4iXX0= */");
 
 /***/ }),
 
@@ -334,7 +820,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-content>\r\n  <div class=\"nav vertical flex\">\r\n    <img src=\"../../../assets/IMG/Logo/Light (Simples).png\" alt=\"Logo do aplicativo MedicaMe\">\r\n    <div class=\"button full flex\" (click)=\"open()\">\r\n      <svg viewBox=\"0 0 24 24\">\r\n        <path d=\"M24 13.616v-3.232c-1.651-.587-2.694-.752-3.219-2.019v-.001c-.527-1.271.1-2.134.847-3.707l-2.285-2.285c-1.561.742-2.433 1.375-3.707.847h-.001c-1.269-.526-1.435-1.576-2.019-3.219h-3.232c-.582 1.635-.749 2.692-2.019 3.219h-.001c-1.271.528-2.132-.098-3.707-.847l-2.285 2.285c.745 1.568 1.375 2.434.847 3.707-.527 1.271-1.584 1.438-3.219 2.02v3.232c1.632.58 2.692.749 3.219 2.019.53 1.282-.114 2.166-.847 3.707l2.285 2.286c1.562-.743 2.434-1.375 3.707-.847h.001c1.27.526 1.436 1.579 2.019 3.219h3.232c.582-1.636.75-2.69 2.027-3.222h.001c1.262-.524 2.12.101 3.698.851l2.285-2.286c-.744-1.563-1.375-2.433-.848-3.706.527-1.271 1.588-1.44 3.221-2.021zm-12 2.384c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z\"/>\r\n      </svg>\r\n    </div>\r\n  </div>\r\n\r\n  <div id=\"mHome\" class=\"menu invisivel\">\r\n    <div id=\"back\" (click)=\"close()\"></div>\r\n\r\n    <div id=\"hMenu\" class=\"content\">\r\n      <div class=\"top full flex\">\r\n        <h3>Configurações</h3>\r\n\r\n        <div class=\"button full flex\">\r\n          <svg viewBox=\"0 0 24 24\">\r\n            <path d=\"M24 13.616v-3.232c-1.651-.587-2.694-.752-3.219-2.019v-.001c-.527-1.271.1-2.134.847-3.707l-2.285-2.285c-1.561.742-2.433 1.375-3.707.847h-.001c-1.269-.526-1.435-1.576-2.019-3.219h-3.232c-.582 1.635-.749 2.692-2.019 3.219h-.001c-1.271.528-2.132-.098-3.707-.847l-2.285 2.285c.745 1.568 1.375 2.434.847 3.707-.527 1.271-1.584 1.438-3.219 2.02v3.232c1.632.58 2.692.749 3.219 2.019.53 1.282-.114 2.166-.847 3.707l2.285 2.286c1.562-.743 2.434-1.375 3.707-.847h.001c1.27.526 1.436 1.579 2.019 3.219h3.232c.582-1.636.75-2.69 2.027-3.222h.001c1.262-.524 2.12.101 3.698.851l2.285-2.286c-.744-1.563-1.375-2.433-.848-3.706.527-1.271 1.588-1.44 3.221-2.021zm-12 2.384c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z\"/>\r\n          </svg>\r\n        </div>\r\n      </div>\r\n\r\n      <div class=\"mid\">\r\n        <div class=\"itens vertical flex\" (click)=\"tutorial()\">\r\n          <div class=\"button full flex\">\r\n            <svg viewBox=\"0 0 24 24\">\r\n              <path d=\"M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm0 18.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25s-.559 1.25-1.25 1.25zm1.961-5.928c-.904.975-.947 1.514-.935 2.178h-2.005c-.007-1.475.02-2.125 1.431-3.468.573-.544 1.025-.975.962-1.821-.058-.805-.73-1.226-1.365-1.226-.709 0-1.538.527-1.538 2.013h-2.01c0-2.4 1.409-3.95 3.59-3.95 1.036 0 1.942.339 2.55.955.57.578.865 1.372.854 2.298-.016 1.383-.857 2.291-1.534 3.021z\"/>\r\n            </svg>\r\n          </div>\r\n          <h3>Tutorial</h3>\r\n        </div>\r\n\r\n        <div class=\"itens vertical flex\" (click)=\"adicionarResponsavel()\">\r\n          <div class=\"button full flex\">\r\n            <svg viewBox=\"0 0 24 24\">\r\n              <path d=\"M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z\"/>\r\n            </svg>\r\n          </div>\r\n          <h3>Adicionar responsável</h3>\r\n        </div>\r\n\r\n        <div class=\"itens vertical flex\" (click)=\"adicionarSintomas()\">\r\n          <div class=\"button full flex\">\r\n            <svg viewBox=\"0 0 24 24\">\r\n              <path d=\"M19.099 11.136c-1.449 1.97-3.599 3.914-6.021 3.597-.655.916-1.387 2.194-2.199 3.678l-1.879.589c1.589-3.101 3.712-6.53 5.989-9.136-.986.642-2.606 2.023-4.016 3.479-1.271-2.656.069-5.115 2.012-6.994-.056.885.337 1.692.631 2.107-.05-.74.036-2.062.576-3.207 1.082-.913 2.039-1.57 3.132-2.145-.177.647-.025 1.423.182 1.907.095-.67.494-1.937.955-2.462 1.364-.88 3.384-1.584 5.539-1.548-.238 1.328-.936 3.484-1.877 4.821-.761.489-1.766.775-2.566.913.663.186 1.407.24 2.052.192-.469.987-.946 1.891-1.667 3-.995.555-2.267.8-3.135.846.607.319 1.714.505 2.292.363zm-1.099 4.009v5.855h-16v-12h6.875c.229-.673.547-1.342.979-2h-9.854v16h20v-9.788c-.574.679-1.239 1.355-2 1.933z\"/>\r\n            </svg>\r\n          </div>\r\n          <h3>Adicionar sintomas</h3>\r\n        </div>\r\n\r\n        <div class=\"itens vertical flex\" (click)=\"sair()\">\r\n          <div class=\"button full flex\">\r\n            <svg viewBox=\"0 0 24 24\">\r\n              <path d=\"M16 2v7h-2v-5h-12v16h12v-5h2v7h-16v-20h16zm2 9v-4l6 5-6 5v-4h-10v-2h10z\"/>\r\n            </svg>\r\n          </div>\r\n          <h3>Sair</h3>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n\r\n  <div class=\"meio\">\r\n    <div class=\"top centerA\">\r\n      <h3>Medicamentos do dia</h3>\r\n      <h3>{{data}}</h3>\r\n    </div>\r\n\r\n    <div class=\"content\">\r\n      <div *ngIf=\"temPendente\" class=\"pendente\">\r\n        <h3>Pendentes</h3>\r\n\r\n        <div *ngFor=\"let l of pendentes\" id=\"{{l.Agendamento}}\" class=\"medicamentos vertical flex\">\r\n          <img src=\"../../../assets/IMG/Icon/{{l.FormaFarmaceutica}}.png\">\r\n\r\n          <div class=\"text\">\r\n            <h3>{{l.Nome}}</h3>\r\n            <p>{{l.Previsao.substring(8, 10) + '/' + l.Previsao.substring(5, 7) + ' - ' + l.Previsao.substring(11, 13) + 'h' + l.Previsao.substring(14, 16)}}</p>\r\n            <p>{{l.Dosagem}}</p>\r\n          </div>\r\n\r\n          <svg viewBox=\"0 0 24 24\" class=\"tomei\" (click)=\"enviar(l.Agendamento, 'Tomou.')\">\r\n            <path d=\"M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.25 17.292l-4.5-4.364 1.857-1.858 2.643 2.506 5.643-5.784 1.857 1.857-7.5 7.643z\"/>\r\n          </svg>\r\n\r\n          <svg viewBox=\"0 0 24 24\" class=\"nao-tomei\" (click)=\"enviar(l.Agendamento, 'Cancelou.')\">\r\n            <path d=\"M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 16.538l-4.592-4.548 4.546-4.587-1.416-1.403-4.545 4.589-4.588-4.543-1.405 1.405 4.593 4.552-4.547 4.592 1.405 1.405 4.555-4.596 4.591 4.55 1.403-1.416z\"/>\r\n          </svg>\r\n        </div>\r\n      </div>\r\n\r\n      <div *ngIf=\"temMedic\" class=\"proximo\">\r\n        <h3>Ainda Hoje</h3>\r\n\r\n        <div *ngFor=\"let l of medicamentos\" class=\"medicamentos vertical flex\">\r\n          <img src=\"../../../assets/IMG/Icon/{{l.FormaFarmaceutica}}.png\">\r\n\r\n          <div class=\"text\">\r\n            <h3>{{l.Nome}}</h3>\r\n            <p>{{l.Previsao.substring(11, 13) + 'h' + l.Previsao.substring(14, 16) + ' - ' + l.Dosagem}}</p>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <div *ngIf=\"temMedicNao\" class=\"naoTem full flex\">\r\n        <svg viewBox=\"0 0 24 24\" fill-rule=\"evenodd\" clip-rule=\"evenodd\">\r\n          <path d=\"M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm-.045 17.51h-.015c-2.285 0-4.469-1.189-6.153-3.349l.789-.614c1.489 1.911 3.394 2.963 5.364 2.963h.013c1.987-.004 3.907-1.078 5.408-3.021l.791.611c-1.693 2.194-3.894 3.405-6.197 3.41zm-3.468-10.01c.552 0 1 .448 1 1s-.448 1-1 1-1-.448-1-1 .448-1 1-1zm7.013 0c.552 0 1 .448 1 1s-.448 1-1 1-1-.448-1-1 .448-1 1-1z\"/>\r\n        </svg>\r\n\r\n        <h3 class=\"centerA\">Nenhum medicamento para hoje!</h3>\r\n      </div>\r\n    </div>\r\n  </div>\r\n\r\n  <div class=\"tabs full flex\">\r\n    <div class=\"button full flex\" (click)=\"lembretes()\">\r\n      <svg viewBox=\"0 0 24 24\">\r\n        <path d=\"M17 3v-2c0-.552.447-1 1-1s1 .448 1 1v2c0 .552-.447 1-1 1s-1-.448-1-1zm-12 1c.553 0 1-.448 1-1v-2c0-.552-.447-1-1-1-.553 0-1 .448-1 1v2c0 .552.447 1 1 1zm13 13v-3h-1v4h3v-1h-2zm-5 .5c0 2.481 2.019 4.5 4.5 4.5s4.5-2.019 4.5-4.5-2.019-4.5-4.5-4.5-4.5 2.019-4.5 4.5zm11 0c0 3.59-2.91 6.5-6.5 6.5s-6.5-2.91-6.5-6.5 2.91-6.5 6.5-6.5 6.5 2.91 6.5 6.5zm-14.237 3.5h-7.763v-13h19v1.763c.727.33 1.399.757 2 1.268v-9.031h-3v1c0 1.316-1.278 2.339-2.658 1.894-.831-.268-1.342-1.111-1.342-1.984v-.91h-9v1c0 1.316-1.278 2.339-2.658 1.894-.831-.268-1.342-1.111-1.342-1.984v-.91h-3v21h11.031c-.511-.601-.938-1.273-1.268-2z\"/>\r\n      </svg>\r\n      <p>Lembretes</p>\r\n    </div>\r\n\r\n    <div class=\"button full flex\" (click)=\"estoque()\">\r\n      <svg viewBox=\"0 0 24 24\">\r\n        <path d=\"M1 24h22v-12h-22v12zm8-9h6v2h-6v-2zm15-7v2h-24v-2l4.474-8h15.087l4.439 8z\"/>\r\n      </svg>\r\n      <p>Estoque</p>\r\n    </div>\r\n\r\n    <div class=\"button middle\">\r\n      <div class=\"principal full flex\">\r\n        <svg viewBox=\"0 0 24 24\">\r\n          <path d=\"M12 6.453l9 8.375v9.172h-6v-6h-6v6h-6v-9.172l9-8.375zm12 5.695l-12-11.148-12 11.133 1.361 1.465 10.639-9.868 10.639 9.883 1.361-1.465z\"/>\r\n        </svg>\r\n      </div>\r\n      <p>Home</p>\r\n    </div>\r\n\r\n    <div class=\"button full flex\" (click)=\"dependentes()\">\r\n      <svg viewBox=\"0 0 24 24\">\r\n        <path d=\"M10.118 16.064c2.293-.529 4.428-.993 3.394-2.945-3.146-5.942-.834-9.119 2.488-9.119 3.388 0 5.644 3.299 2.488 9.119-1.065 1.964 1.149 2.427 3.394 2.945 1.986.459 2.118 1.43 2.118 3.111l-.003.825h-15.994c0-2.196-.176-3.407 2.115-3.936zm-10.116 3.936h6.001c-.028-6.542 2.995-3.697 2.995-8.901 0-2.009-1.311-3.099-2.998-3.099-2.492 0-4.226 2.383-1.866 6.839.775 1.464-.825 1.812-2.545 2.209-1.49.344-1.589 1.072-1.589 2.333l.002.619z\"/>\r\n      </svg>\r\n      <p>Dependentes</p>\r\n    </div>\r\n\r\n    <div class=\"button full flex\" (click)=\"relatorio()\">\r\n      <svg viewBox=\"0 0 24 24\">\r\n        <path d=\"M22 13v-13h-20v24h8.409c4.857 0 3.335-8 3.335-8 3.009.745 8.256.419 8.256-3zm-4-7h-12v-1h12v1zm0 3h-12v-1h12v1zm0 3h-12v-1h12v1zm-2.091 6.223c2.047.478 4.805-.279 6.091-1.179-1.494 1.998-5.23 5.708-7.432 6.881 1.156-1.168 1.563-4.234 1.341-5.702z\"/>\r\n      </svg>\r\n      <p>Relatório</p>\r\n    </div>\r\n  </div>\r\n</ion-content>\r\n");
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-content>\n  <div class=\"nav vertical flex\">\n    <img src=\"../../../assets/IMG/Logo/Light (Simples).png\" alt=\"Logo do aplicativo MedicaMe\">\n    <div class=\"button full flex\" (click)=\"open()\">\n      <svg viewBox=\"0 0 24 24\">\n        <path d=\"M24 13.616v-3.232c-1.651-.587-2.694-.752-3.219-2.019v-.001c-.527-1.271.1-2.134.847-3.707l-2.285-2.285c-1.561.742-2.433 1.375-3.707.847h-.001c-1.269-.526-1.435-1.576-2.019-3.219h-3.232c-.582 1.635-.749 2.692-2.019 3.219h-.001c-1.271.528-2.132-.098-3.707-.847l-2.285 2.285c.745 1.568 1.375 2.434.847 3.707-.527 1.271-1.584 1.438-3.219 2.02v3.232c1.632.58 2.692.749 3.219 2.019.53 1.282-.114 2.166-.847 3.707l2.285 2.286c1.562-.743 2.434-1.375 3.707-.847h.001c1.27.526 1.436 1.579 2.019 3.219h3.232c.582-1.636.75-2.69 2.027-3.222h.001c1.262-.524 2.12.101 3.698.851l2.285-2.286c-.744-1.563-1.375-2.433-.848-3.706.527-1.271 1.588-1.44 3.221-2.021zm-12 2.384c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z\"/>\n      </svg>\n    </div>\n  </div>\n\n  <div id=\"mHome\" class=\"menu invisivel\">\n    <div id=\"back\" (click)=\"close()\"></div>\n\n    <div id=\"hMenu\" class=\"content\">\n      <div class=\"top full flex\">\n        <h3>Configurações</h3>\n\n        <div class=\"button full flex\">\n          <svg viewBox=\"0 0 24 24\">\n            <path d=\"M24 13.616v-3.232c-1.651-.587-2.694-.752-3.219-2.019v-.001c-.527-1.271.1-2.134.847-3.707l-2.285-2.285c-1.561.742-2.433 1.375-3.707.847h-.001c-1.269-.526-1.435-1.576-2.019-3.219h-3.232c-.582 1.635-.749 2.692-2.019 3.219h-.001c-1.271.528-2.132-.098-3.707-.847l-2.285 2.285c.745 1.568 1.375 2.434.847 3.707-.527 1.271-1.584 1.438-3.219 2.02v3.232c1.632.58 2.692.749 3.219 2.019.53 1.282-.114 2.166-.847 3.707l2.285 2.286c1.562-.743 2.434-1.375 3.707-.847h.001c1.27.526 1.436 1.579 2.019 3.219h3.232c.582-1.636.75-2.69 2.027-3.222h.001c1.262-.524 2.12.101 3.698.851l2.285-2.286c-.744-1.563-1.375-2.433-.848-3.706.527-1.271 1.588-1.44 3.221-2.021zm-12 2.384c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z\"/>\n          </svg>\n        </div>\n      </div>\n\n      <div class=\"mid\">\n        <div class=\"itens vertical flex\" (click)=\"tutorial()\">\n          <div class=\"button full flex\">\n            <svg viewBox=\"0 0 24 24\">\n              <path d=\"M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm0 18.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25s-.559 1.25-1.25 1.25zm1.961-5.928c-.904.975-.947 1.514-.935 2.178h-2.005c-.007-1.475.02-2.125 1.431-3.468.573-.544 1.025-.975.962-1.821-.058-.805-.73-1.226-1.365-1.226-.709 0-1.538.527-1.538 2.013h-2.01c0-2.4 1.409-3.95 3.59-3.95 1.036 0 1.942.339 2.55.955.57.578.865 1.372.854 2.298-.016 1.383-.857 2.291-1.534 3.021z\"/>\n            </svg>\n          </div>\n          <h3>Tutorial</h3>\n        </div>\n\n        <div class=\"itens vertical flex\" (click)=\"adicionarResponsavel()\">\n          <div class=\"button full flex\">\n            <svg viewBox=\"0 0 24 24\">\n              <path d=\"M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z\"/>\n            </svg>\n          </div>\n          <h3>Adicionar responsável</h3>\n        </div>\n\n        <div class=\"itens vertical flex\" (click)=\"adicionarSintomas()\">\n          <div class=\"button full flex\">\n            <svg viewBox=\"0 0 24 24\">\n              <path d=\"M19.099 11.136c-1.449 1.97-3.599 3.914-6.021 3.597-.655.916-1.387 2.194-2.199 3.678l-1.879.589c1.589-3.101 3.712-6.53 5.989-9.136-.986.642-2.606 2.023-4.016 3.479-1.271-2.656.069-5.115 2.012-6.994-.056.885.337 1.692.631 2.107-.05-.74.036-2.062.576-3.207 1.082-.913 2.039-1.57 3.132-2.145-.177.647-.025 1.423.182 1.907.095-.67.494-1.937.955-2.462 1.364-.88 3.384-1.584 5.539-1.548-.238 1.328-.936 3.484-1.877 4.821-.761.489-1.766.775-2.566.913.663.186 1.407.24 2.052.192-.469.987-.946 1.891-1.667 3-.995.555-2.267.8-3.135.846.607.319 1.714.505 2.292.363zm-1.099 4.009v5.855h-16v-12h6.875c.229-.673.547-1.342.979-2h-9.854v16h20v-9.788c-.574.679-1.239 1.355-2 1.933z\"/>\n            </svg>\n          </div>\n          <h3>Adicionar sintomas</h3>\n        </div>\n\n        <div class=\"itens vertical flex\" (click)=\"sair()\">\n          <div class=\"button full flex\">\n            <svg viewBox=\"0 0 24 24\">\n              <path d=\"M16 2v7h-2v-5h-12v16h12v-5h2v7h-16v-20h16zm2 9v-4l6 5-6 5v-4h-10v-2h10z\"/>\n            </svg>\n          </div>\n          <h3>Sair</h3>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"meio\">\n    <div class=\"top centerA\">\n      <h3>Medicamentos do dia</h3>\n      <h3>{{data}}</h3>\n    </div>\n\n    <div class=\"content\">\n      <div *ngIf=\"temPendente\" class=\"pendente\">\n        <h3>Pendentes</h3>\n\n        <div *ngFor=\"let l of pendentes\" id=\"{{l.Agendamento}}\" class=\"medicamentos vertical flex\">\n          <img src=\"../../../assets/IMG/Icon/{{l.FormaFarmaceutica}}.png\">\n\n          <div class=\"text\">\n            <h3>{{l.Nome}}</h3>\n            <p>{{l.Previsao.substring(8, 10) + '/' + l.Previsao.substring(5, 7) + ' - ' + l.Previsao.substring(11, 13) + 'h' + l.Previsao.substring(14, 16)}}</p>\n            <p>{{l.Dosagem}}</p>\n          </div>\n\n          <svg viewBox=\"0 0 24 24\" class=\"tomei\" (click)=\"enviar(l.Agendamento, 'Tomou.')\">\n            <path d=\"M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.25 17.292l-4.5-4.364 1.857-1.858 2.643 2.506 5.643-5.784 1.857 1.857-7.5 7.643z\"/>\n          </svg>\n\n          <svg viewBox=\"0 0 24 24\" class=\"nao-tomei\" (click)=\"enviar(l.Agendamento, 'Cancelou.')\">\n            <path d=\"M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 16.538l-4.592-4.548 4.546-4.587-1.416-1.403-4.545 4.589-4.588-4.543-1.405 1.405 4.593 4.552-4.547 4.592 1.405 1.405 4.555-4.596 4.591 4.55 1.403-1.416z\"/>\n          </svg>\n        </div>\n      </div>\n\n      <div *ngIf=\"temMedic\" class=\"proximo\">\n        <h3>Ainda Hoje</h3>\n\n        <div *ngFor=\"let l of medicamentos\" class=\"medicamentos vertical flex\">\n          <img src=\"../../../assets/IMG/Icon/{{l.FormaFarmaceutica}}.png\">\n\n          <div class=\"text\">\n            <h3>{{l.Nome}}</h3>\n            <p>{{l.Previsao.substring(11, 13) + 'h' + l.Previsao.substring(14, 16) + ' - ' + l.Dosagem}}</p>\n          </div>\n        </div>\n      </div>\n\n      <div *ngIf=\"temMedicNao\" class=\"naoTem full flex\">\n        <svg viewBox=\"0 0 24 24\" fill-rule=\"evenodd\" clip-rule=\"evenodd\">\n          <path d=\"M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm-.045 17.51h-.015c-2.285 0-4.469-1.189-6.153-3.349l.789-.614c1.489 1.911 3.394 2.963 5.364 2.963h.013c1.987-.004 3.907-1.078 5.408-3.021l.791.611c-1.693 2.194-3.894 3.405-6.197 3.41zm-3.468-10.01c.552 0 1 .448 1 1s-.448 1-1 1-1-.448-1-1 .448-1 1-1zm7.013 0c.552 0 1 .448 1 1s-.448 1-1 1-1-.448-1-1 .448-1 1-1z\"/>\n        </svg>\n\n        <h3 class=\"centerA\">Nenhum medicamento para hoje!</h3>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"tabs full flex\">\n    <div class=\"button full flex\" (click)=\"lembretes()\">\n      <svg viewBox=\"0 0 24 24\">\n        <path d=\"M17 3v-2c0-.552.447-1 1-1s1 .448 1 1v2c0 .552-.447 1-1 1s-1-.448-1-1zm-12 1c.553 0 1-.448 1-1v-2c0-.552-.447-1-1-1-.553 0-1 .448-1 1v2c0 .552.447 1 1 1zm13 13v-3h-1v4h3v-1h-2zm-5 .5c0 2.481 2.019 4.5 4.5 4.5s4.5-2.019 4.5-4.5-2.019-4.5-4.5-4.5-4.5 2.019-4.5 4.5zm11 0c0 3.59-2.91 6.5-6.5 6.5s-6.5-2.91-6.5-6.5 2.91-6.5 6.5-6.5 6.5 2.91 6.5 6.5zm-14.237 3.5h-7.763v-13h19v1.763c.727.33 1.399.757 2 1.268v-9.031h-3v1c0 1.316-1.278 2.339-2.658 1.894-.831-.268-1.342-1.111-1.342-1.984v-.91h-9v1c0 1.316-1.278 2.339-2.658 1.894-.831-.268-1.342-1.111-1.342-1.984v-.91h-3v21h11.031c-.511-.601-.938-1.273-1.268-2z\"/>\n      </svg>\n      <p>Lembretes</p>\n    </div>\n\n    <div class=\"button full flex\" (click)=\"estoque()\">\n      <svg viewBox=\"0 0 24 24\">\n        <path d=\"M1 24h22v-12h-22v12zm8-9h6v2h-6v-2zm15-7v2h-24v-2l4.474-8h15.087l4.439 8z\"/>\n      </svg>\n      <p>Estoque</p>\n    </div>\n\n    <div class=\"button middle\">\n      <div class=\"principal full flex\">\n        <svg viewBox=\"0 0 24 24\">\n          <path d=\"M12 6.453l9 8.375v9.172h-6v-6h-6v6h-6v-9.172l9-8.375zm12 5.695l-12-11.148-12 11.133 1.361 1.465 10.639-9.868 10.639 9.883 1.361-1.465z\"/>\n        </svg>\n      </div>\n      <p>Home</p>\n    </div>\n\n    <div class=\"button full flex\" (click)=\"dependentes()\">\n      <svg viewBox=\"0 0 24 24\">\n        <path d=\"M10.118 16.064c2.293-.529 4.428-.993 3.394-2.945-3.146-5.942-.834-9.119 2.488-9.119 3.388 0 5.644 3.299 2.488 9.119-1.065 1.964 1.149 2.427 3.394 2.945 1.986.459 2.118 1.43 2.118 3.111l-.003.825h-15.994c0-2.196-.176-3.407 2.115-3.936zm-10.116 3.936h6.001c-.028-6.542 2.995-3.697 2.995-8.901 0-2.009-1.311-3.099-2.998-3.099-2.492 0-4.226 2.383-1.866 6.839.775 1.464-.825 1.812-2.545 2.209-1.49.344-1.589 1.072-1.589 2.333l.002.619z\"/>\n      </svg>\n      <p>Dependentes</p>\n    </div>\n\n    <div class=\"button full flex\" (click)=\"relatorio()\">\n      <svg viewBox=\"0 0 24 24\">\n        <path d=\"M22 13v-13h-20v24h8.409c4.857 0 3.335-8 3.335-8 3.009.745 8.256.419 8.256-3zm-4-7h-12v-1h12v1zm0 3h-12v-1h12v1zm0 3h-12v-1h12v1zm-2.091 6.223c2.047.478 4.805-.279 6.091-1.179-1.494 1.998-5.23 5.708-7.432 6.881 1.156-1.168 1.563-4.234 1.341-5.702z\"/>\n      </svg>\n      <p>Relatório</p>\n    </div>\n  </div>\n</ion-content>\n");
 
 /***/ })
 

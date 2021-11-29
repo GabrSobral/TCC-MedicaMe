@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavegationService } from 'src/app/services/navegation.service';
 import { ServidorService } from 'src/app/services/servidor.service';
+import { LocalNotifications } from '@capacitor/local-notifications'
 
 @Component({
   selector: 'app-home',
@@ -82,6 +83,18 @@ export class HomePage implements OnInit {
     let dados = 'phpSituacao=' + situacao + '&phpCodigo=' + codigo + '&phpEmail=' + localStorage.getItem('email');
     
     this.servidor.enviar('Home/situacao.php', dados).subscribe(res => {
+      console.log("Banana")
+      LocalNotifications.schedule({
+        notifications: [{
+          id: 1,
+          body: "Toma remédio oh animal",
+          title: "Remédio mano",
+          autoCancel: false,
+          schedule: {
+            on: { second: 5 }
+          }
+        }]
+      }).then((data) => { console.log(data) })
       this.carregar();
     });
   }
