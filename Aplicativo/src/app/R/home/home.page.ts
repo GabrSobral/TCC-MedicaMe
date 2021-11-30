@@ -73,10 +73,10 @@ export class HomePage implements OnInit {
   //#endregion
 
   //#region Tomei ou Não tomei
-  enviar(codigo, situacao)
+  enviar(nome, codigo: number, situacao)
   {
     //Animação
-    document.getElementById(codigo).classList.add('OutAlerta');
+    document.getElementById(String(codigo)).classList.add('OutAlerta');
     setTimeout(function(){}, 301);
 
     //Enviar ao PHP
@@ -84,18 +84,17 @@ export class HomePage implements OnInit {
     
     this.servidor.enviar('Home/situacao.php', dados).subscribe(res => {
       console.log("Banana")
-      LocalNotifications.schedule({
-        notifications: [{
-          id: 1,
-          body: "Toma remédio oh animal",
-          title: "Remédio mano",
-          autoCancel: false,
-          schedule: {
-            on: { second: 5 }
-          }
-        }]
-      }).then((data) => { console.log(data) })
-      this.carregar();
+      if(res[0]['Erro'] == 'Notificar') {
+        LocalNotifications.schedule({
+          notifications: [{
+            id: codigo,
+            title: "Seu medicamento está acabando!",
+            body: `${nome} está terminando em seu estoque, reabasteça o mais rápido possível.`,
+            autoCancel: false,
+          }]
+        }).then((data) => { console.log(data) })
+        this.carregar();
+      }
     });
   }
   //#endregion
